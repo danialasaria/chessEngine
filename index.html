@@ -45,18 +45,15 @@ Building a chess engine to beat Rush</h3>
 var board,
     game = new Chess();
 
-/*The "AI" part starts here */
+// AI
 
-var calculateBestMove =function(game) {
-
+//currently completely random moves are selected based on legal moves in the position
+var calculateBestMove = function(game) {
     var newGameMoves = game.ugly_moves();
-
     return newGameMoves[Math.floor(Math.random() * newGameMoves.length)];
-
 };
 
-/* board visualization and games state handling starts here*/
-
+// board visualization and games state handling
 var onDragStart = function (source, piece, position, orientation) {
     if (game.in_checkmate() === true || game.in_draw() === true ||
         piece.search(/^b/) !== -1) {
@@ -74,6 +71,7 @@ var makeBestMove = function () {
     }
 };
 
+//if game not over calculate the best move
 var getBestMove = function (game) {
     if (game.game_over()) {
         alert('Game over');
@@ -82,6 +80,7 @@ var getBestMove = function (game) {
     return bestMove;
 };
 
+//each pair of moves displayed on one line
 var renderMoveHistory = function (moves) {
     var historyElement = $('#move-history').empty();
     historyElement.empty();
@@ -113,6 +112,7 @@ var onSnapEnd = function () {
     board.position(game.fen());
 };
 
+//hovering over a piece searches all legal moves for the piece in curr position and highlights all possible moves 
 var onMouseoverSquare = function(square, piece) {
     var moves = game.moves({
         square: square,
