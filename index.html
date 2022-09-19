@@ -49,8 +49,30 @@ var board,
 
 //currently completely random moves are selected based on legal moves in the position
 var calculateBestMove = function(game) {
+    //all possible moves
     var newGameMoves = game.ugly_moves();
-    return newGameMoves[Math.floor(Math.random() * newGameMoves.length)];
+    var bestMove = null;
+    //large negative number that will be replaced
+    var bestValue = -9999;
+
+    for(var i = 0; i < newGameMoves.length; i++) {
+        var newGameMove = newGameMoves[i];
+        //if we make the move what will the evaluation be
+        game.ugly_move(newGameMove);
+        //take negative as AI is black
+        var boardValue = -evaluateBoard(game.board())
+        //after evaluating go back to try other possibilities
+        game.undo();
+        //if the move is better than the best move we have label as new best move
+        //WHY ISN'T THIS LESS THAN?
+        if(boardValue > bestValue) {
+            bestValue = boardValue;
+            bestMove = newGameMove;
+        }
+    }
+
+    return bestMove
+    //return newGameMoves[Math.floor(Math.random() * newGameMoves.length)]; 
 };
 
 // board visualization and games state handling
