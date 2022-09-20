@@ -30,13 +30,29 @@
     <!-- Used to get images -->
 <base href="http://chessboardjs.com/" />
 <h3 class="board">
-Building a chess engine to beat Rush</h3>
-<div id="board" class="board"></div>
-<br>
-<div class="info">
-    <div id="move-history" class="move-history">
+    <div id="board" class="board"></div>
+    <br>
+    <div class="info">
+        Search depth:
+        <select id="search-depth">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+    
+        <br>
+        <span>Positions evaluated: <span id="position-count"></span></span>
+        <br>
+        <span>Time: <span id="time"></span></span>
+        <br>
+        <span>Positions/s: <span id="positions-per-s"></span> </span>
+        <br>
+        <br>
+        <div id="move-history" class="move-history">
+        </div>
     </div>
-</div>
 
 
     <script type="text/javascript">//<![CDATA[
@@ -45,8 +61,59 @@ Building a chess engine to beat Rush</h3>
 var board,
     game = new Chess();
 
-// AI
+/* AI creates a recursive tree of all possible moves and statically evaluates
+at the leaf nodes. Then you return either the max or min eval depending on whose move
+it is */
+var minimax = function (depth, game, isMaximisingPlayer) {
+    positionCount++;
+    if (depth === 0) {
+        //evaluate at leaf (negative as AI is black)
+        return -evaluateBoard(game.board());
+    }
 
+    var newGameMoves = game.ugly_moves();
+
+    if (isMaximisingPlayer) {
+        var bestMove = -9999;
+        for (var i = 0; i < newGameMoves.length; i++) {
+            game.ugly_move(newGameMoves[i]);
+            //greater value of future tree position for the maximising player
+            bestMove = Math.max(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+            game.undo();
+        }
+        return bestMove;
+    } else {
+        var bestMove = 9999;
+        for (var i = 0; i < newGameMoves.length; i++) {
+            game.ugly_move(newGameMoves[i]);
+            //opposition is looking to minimize the evaluation
+            bestMove = Math.min(bestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+            game.undo();
+        }
+        return bestMove;
+    }
+};
+
+var minimaxRoot = function(depth, game, isMaximisingPlayer) {
+
+    var newGameMoves = game.ugly_moves();
+    var bestMove = -9999;
+    var bestMoveFound;
+
+    for(var i = 0; i < newGameMoves.length; i++) {
+        var newGameMove = newGameMoves[i];
+        game.ugly_move(newGameMove);
+        var value = minimax(depth - 1, game, !isMaximisingPlayer);
+        game.undo();
+        if(value >= bestMove) {
+            bestMove = value;
+            bestMoveFound = newGameMove;
+        }
+    }
+    return bestMoveFound;
+};
+
+/*
 //currently if there is an option to take a piece the AI will
 var calculateBestMove = function(game) {
     //all possible moves
@@ -74,6 +141,7 @@ var calculateBestMove = function(game) {
     return bestMove
     //return newGameMoves[Math.floor(Math.random() * newGameMoves.length)]; 
 };
+*/
 
 var evaluateBoard = function (board) {
     var totalEvaluation = 0;
@@ -133,7 +201,19 @@ var getBestMove = function (game) {
     if (game.game_over()) {
         alert('Game over');
     }
-    var bestMove = calculateBestMove(game);
+
+    positionCount = 0;
+    var depth = parseInt($('#search-depth').find(':selected').text());
+
+    var d = new Date().getTime();
+    var bestMove = minimaxRoot(depth, game, true);
+    var d2 = new Date().getTime();
+    var moveTime = (d2 - d);
+    var positionsPerS = ( positionCount * 1000 / moveTime);
+
+    $('#position-count').text(positionCount);
+    $('#time').text(moveTime/1000 + 's');
+    $('#positions-per-s').text(positionsPerS);
     return bestMove;
 };
 
@@ -141,8 +221,10 @@ var getBestMove = function (game) {
 var renderMoveHistory = function (moves) {
     var historyElement = $('#move-history').empty();
     historyElement.empty();
+    moveCounter = 1;
     for (var i = 0; i < moves.length; i = i + 2) {
-        historyElement.append('<span>' + moves[i] + ' ' + ( moves[i + 1] ? moves[i + 1] : ' ') + '</span><br>')
+        historyElement.append('<span>' + (moveCounter) + ". " + moves[i] + ' ' + ( moves[i + 1] ? moves[i + 1] : ' ') + '</span><br>')
+        moveCounter++;
     }
     historyElement.scrollTop(historyElement[0].scrollHeight);
 
