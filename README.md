@@ -1,1 +1,1 @@
-# creating a chess engine that will beat my friend Rush
+creating a chess engine that will beat my friend Rush
