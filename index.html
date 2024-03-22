@@ -2,33 +2,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title></title>
+  <title>Chess Engine</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="robots" content="noindex, nofollow">
   <meta name="googlebot" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <script type="text/javascript" src="index.js"></script>
-
-  <script
-    type="text/javascript"
-    src="//code.jquery.com/jquery-2.2.4.js"
-    
-  ></script>
-
-    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
-    <link rel="stylesheet" href="index.css" type="text/css">
-
-      <script type="text/javascript" src="https://cdn.rawgit.com/lhartikk/simple-chess-ai/master/lib/js/chess.js"></script>
-      <script type="text/javascript" src="https://chessboardjs.com/js/chessboard.js"></script>
-
-  <script id="insert"></script>
-
+  <script src="./vendor/jquery.js"></script>
+  <link rel="stylesheet" href="index.css" type="text/css">
+  <script src="./vendor/chess.js"></script>
+  <script src="./vendor/chessboard.js"></script>
 </head>
 <body>
-    <!-- Used to get images -->
-<base href="http://chessboardjs.com/" />
 <h3 class="board">
     <div id="board" class="board"></div>
     <br>
@@ -38,10 +22,7 @@
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3" selected>3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
         </select>
-    
         <br>
         <span>Positions evaluated: <span id="position-count"></span></span>
         <br>
@@ -53,19 +34,16 @@
         <div id="move-history" class="move-history">
         </div>
     </div>
-
-
-    <script type="text/javascript">//<![CDATA[
-
+<script type="text/javascript">
 
 var board,
     game = new Chess();
 
-/* AI creates a recursive tree of all possible moves and statically evaluates
+/* We create a recursive tree of all possible moves and statically evaluates
 at the leaf nodes. Then you return either the max or min eval depending on whose move
 it is */
 
-//adding alpha beta pruning to avoid searching branches of the tree when we can deduce the outcome
+//Alpha beta pruning enables us to avoid searching branches of the tree when we can deduce the outcome earlier on in search algorithm. 
 
 var minimaxRoot =function(depth, game, isMaximisingPlayer) {
 
@@ -124,36 +102,6 @@ var minimax = function (depth, game, alpha, beta, isMaximisingPlayer) {
     }
 };
 
-/*
-//currently if there is an option to take a piece the AI will
-var calculateBestMove = function(game) {
-    //all possible moves
-    var newGameMoves = game.ugly_moves();
-    var bestMove = null;
-    //large negative number that will be replaced
-    var bestValue = -9999;
-
-    for(var i = 0; i < newGameMoves.length; i++) {
-        var newGameMove = newGameMoves[i];
-        //if we make the move what will the evaluation be
-        game.ugly_move(newGameMove);
-        //take negative as AI is black
-        var boardValue = -evaluateBoard(game.board())
-        //after evaluating go back to try other possibilities
-        game.undo();
-        //if the move is better than the best move we have label as new best move
-        //WHY ISN'T THIS LESS THAN?
-        if(boardValue > bestValue) {
-            bestValue = boardValue;
-            bestMove = newGameMove;
-        }
-    }
-
-    return bestMove
-    //return newGameMoves[Math.floor(Math.random() * newGameMoves.length)]; 
-};
-*/
-
 var evaluateBoard = function (board) {
     var totalEvaluation = 0;
     for (var i = 0; i < 8; i++) {
@@ -168,8 +116,8 @@ var reverseArray = function(array) {
     return array.slice().reverse();
 };
 
-/*evaluate based on the location of the pieces on the board 
-(ex: knight in the center of the board is better or pawn on 7th is worth a piece)*/
+/* Evaluate position based on the location of the pieces on the board 
+(ex: knight in the center of the board is better or pawn on 7th is worth a piece) */
 var pawnEvalWhite =
     [
         [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
@@ -273,7 +221,7 @@ var getPieceValue = function (piece, x, y) {
     return piece.color === 'w' ? absoluteValue : -absoluteValue;
 };
 
-// board visualization and games state handling
+// Board visualization and game state handling
 var onDragStart = function (source, piece, position, orientation) {
     if (game.in_checkmate() === true || game.in_draw() === true ||
         piece.search(/^b/) !== -1) {
@@ -291,7 +239,6 @@ var makeBestMove = function () {
     }
 };
 
-//if game not over calculate the best move
 var getBestMove = function (game) {
     if (game.game_over()) {
         alert('Game over');
@@ -312,7 +259,7 @@ var getBestMove = function (game) {
     return bestMove;
 };
 
-//each pair of moves displayed on one line
+//Each pair of moves displayed on one line
 var renderMoveHistory = function (moves) {
     var historyElement = $('#move-history').empty();
     historyElement.empty();
@@ -346,7 +293,7 @@ var onSnapEnd = function () {
     board.position(game.fen());
 };
 
-//hovering over a piece searches all legal moves for the piece in curr position and highlights all possible moves 
+//Hovering over a piece searches all legal moves for the piece in curr position and highlights all possible moves 
 var onMouseoverSquare = function(square, piece) {
     var moves = game.moves({
         square: square,
@@ -384,6 +331,7 @@ var greySquare = function(square) {
 var cfg = {
     draggable: true,
     position: 'start',
+    pieceTheme: 'images/chessPieces/{piece}.png',
     onDragStart: onDragStart,
     onDrop: onDrop,
     onMouseoutSquare: onMouseoutSquare,
@@ -392,22 +340,16 @@ var cfg = {
 };
 board = ChessBoard('board', cfg);
 
+//Pass the height of the content to the embedded parent frame
+if (window.parent && window.parent.parent){
+    window.parent.parent.postMessage(["resultsFrame", {
+    height: document.body.getBoundingClientRect().height,
+    slug: "oeqbfwg0"
+    }], "*")
+}
 
-  //]]></script>
-
-  <script>
-    // tell the embed parent frame the height of the content
-    if (window.parent && window.parent.parent){
-      window.parent.parent.postMessage(["resultsFrame", {
-        height: document.body.getBoundingClientRect().height,
-        slug: "oeqbfwg0"
-      }], "*")
-    }
-
-    // always overwrite window.name, in case users try to set it manually
-    window.name = "result"
-  </script>
-
-
+//Always overwrite window.name, in case users try to set it manually
+window.name = "result"
+</script>
 </body>
 </html>

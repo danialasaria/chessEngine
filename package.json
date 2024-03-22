@@ -1,5 +1,10 @@
 {
   "dependencies": {
-    "chess.js": "^1.0.0-alpha.0"
+    "jquery": "^3.7.1",
+    "vite": "^5.1.6"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
   }
 }
