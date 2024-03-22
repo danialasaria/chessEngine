@@ -1,10 +1,5 @@
 {
   "dependencies": {
-    "jquery": "^3.7.1",
-    "vite": "^5.1.6"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build"
+    "jquery": "^3.7.1"
   }
 }
