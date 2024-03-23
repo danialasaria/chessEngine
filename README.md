@@ -1,4 +1,4 @@
-A HTML/JS/CSS chess engine created by Danial Asaria using Alpha-beta pruning.
+###### A HTML/JS/CSS chess engine created by Danial Asaria using Alpha-beta pruning.
 
 https://github.com/danialasaria/chessEngine/assets/34591059/e7e104a6-b019-4aa8-bf48-58640b1f0090
 
@@ -31,8 +31,7 @@ https://github.com/danialasaria/chessEngine/assets/34591059/e7e104a6-b019-4aa8-b
     This command reads the `package.json` file in the project directory and installs all the necessary dependencies listed there.
 
 ## Running the Project
-
-    After setting up the project, you can run the HTML file in your browser. There are two main ways to do this:
+After setting up the project, you can run the HTML file in your browser. There are two main ways to do this:
 
 1. **Using a Local Development Server**
 
@@ -49,7 +48,7 @@ https://github.com/danialasaria/chessEngine/assets/34591059/e7e104a6-b019-4aa8-b
     ```
 
     By default, `serve` will host your project on a local web server, usually accessible at `http://localhost:3000`. Open your web browser and go to this URL to view your project.
-    
+
 2. **Directly in Your Browser**
 
 - Navigate to the project folder in your file explorer or finder.
